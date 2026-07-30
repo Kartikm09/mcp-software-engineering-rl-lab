@@ -1,0 +1,1 @@
+"""Issue tracker MCP server."""
