@@ -7,7 +7,7 @@
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| Pytest | Pass | 23 passed, 0 failed, 0 skipped in 30.15 seconds |
+| Pytest | Pass | 23 passed, 0 failed, 0 skipped |
 | Ruff lint | Pass | All Python files passed configured `E`, `F`, `I`, `B`, `UP`, and `SIM` rules |
 | Ruff format | Pass | 146 files formatted |
 | Task/schema validation | Pass | 6 tasks and 6 environment descriptors |
@@ -15,6 +15,7 @@
 | Golden patches | Pass | 6 accepted |
 | Negative controls | Pass | 6 rejected as `hidden_test_failure` |
 | Secret scan | Pass | No live-looking credentials found |
+| Dependency audit | Pass | No known vulnerabilities found |
 | Local Markdown links | Pass after report creation | All recorded local references resolve |
 | Browser evidence | Pass | 6 rows rendered; 0 console warnings or errors |
 | Docker smoke | Not run | Docker CLI is unavailable on this machine |
@@ -44,6 +45,7 @@ python -m pytest -ra
 python scripts/verify_golden_patches.py
 python scripts/run_performance_benchmarks.py
 python scripts/secret_scan.py
+python -m pip_audit --local --skip-editable
 python scripts/check_markdown_links.py
 ```
 
