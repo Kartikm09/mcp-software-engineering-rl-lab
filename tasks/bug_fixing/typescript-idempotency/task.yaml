@@ -1,0 +1,46 @@
+schema_version: "1.0"
+id: typescript-idempotency
+title: Coalesce concurrent work by idempotency key
+language: typescript
+task_type: reliability_fix
+initial_prompt: Concurrent calls with the same idempotency key trigger duplicate synthetic side effects. Repair the race without globally serializing unrelated keys.
+baseline_path: baseline
+public_tests_path: public_tests
+held_out_tests_path: held_out_tests
+golden_patch_path: golden/solution.patch
+incorrect_patch_paths: [incorrect_patches/global-coalescing.patch]
+expected_trace_path: expected_tool_trace.json
+required_tools:
+  - issue_tracker.get_acceptance_criteria
+  - repository.read_file
+  - documentation.search_docs
+  - test_runner.run_public_tests
+required_evidence: [concurrency contract, baseline source, distinct-key requirement, test evidence]
+hidden_information:
+  - Concurrent calls with the same key must share one in-flight promise.
+  - Different keys must remain independently concurrent and completed promises must be evicted.
+failure_categories: [accepted, runtime_error, test_failure, hidden_test_failure, contract_violation, incorrect_tool_use, missing_evidence, malformed_patch]
+allowed_changes: [idempotency.ts]
+commands:
+  public:
+    - [$NODE, --test, idempotency_public.test.mjs]
+  held_out:
+    - [$NODE, --test, idempotency_held_out.test.mjs]
+  benchmark: []
+timeout_seconds: 30
+performance_threshold: null
+resource_limits:
+  max_tool_calls: 20
+  command_timeout_seconds: 30
+  max_output_bytes: 100000
+  network_enabled: false
+reward_weights:
+  tool_discovery: 0.05
+  relevant_tool_selection: 0.05
+  evidence_gathering: 0.10
+  patch_correctness: 0.25
+  public_tests: 0.15
+  held_out_tests: 0.20
+  maintainability: 0.05
+  performance: 0.10
+  final_explanation: 0.05

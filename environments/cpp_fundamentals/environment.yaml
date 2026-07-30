@@ -1,0 +1,7 @@
+schema_version: "1.0"
+id: cpp-fundamentals-environment
+language: cpp
+task_path: tasks/test_improvement/cpp-binary-search
+toolchain: C++20
+network: disabled
+

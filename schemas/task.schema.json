@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/mcp-rl/task.schema.json",
+  "title": "MCP software-engineering task manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "id", "title", "language", "task_type", "initial_prompt",
+    "baseline_path", "public_tests_path", "held_out_tests_path", "golden_patch_path",
+    "incorrect_patch_paths", "expected_trace_path", "required_tools", "required_evidence",
+    "hidden_information", "failure_categories", "allowed_changes", "commands",
+    "timeout_seconds", "performance_threshold", "resource_limits", "reward_weights"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,79}$"},
+    "title": {"type": "string", "minLength": 8},
+    "language": {"enum": ["python", "java", "rust", "go", "typescript", "cpp"]},
+    "task_type": {"enum": ["bug_fixing", "feature_implementation", "codebase_refactoring", "performance_optimisation", "reliability_fix", "algorithmic_correction"]},
+    "initial_prompt": {"type": "string", "minLength": 20},
+    "baseline_path": {"type": "string", "minLength": 1},
+    "public_tests_path": {"type": "string", "minLength": 1},
+    "held_out_tests_path": {"type": "string", "minLength": 1},
+    "golden_patch_path": {"type": "string", "pattern": "\\.patch$"},
+    "incorrect_patch_paths": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "\\.patch$"}},
+    "expected_trace_path": {"type": "string", "pattern": "\\.json$"},
+    "required_tools": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z_]+\\.[a-z_]+$"}},
+    "required_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}},
+    "hidden_information": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 10}},
+    "failure_categories": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/classification"}},
+    "allowed_changes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public", "held_out", "benchmark"],
+      "properties": {
+        "public": {"$ref": "#/$defs/commands"},
+        "held_out": {"$ref": "#/$defs/commands"},
+        "benchmark": {"type": "array", "items": {"$ref": "#/$defs/command"}}
+      }
+    },
+    "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 120},
+    "performance_threshold": {"type": ["string", "null"]},
+    "resource_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_tool_calls", "command_timeout_seconds", "max_output_bytes", "network_enabled"],
+      "properties": {
+        "max_tool_calls": {"type": "integer", "minimum": 1, "maximum": 200},
+        "command_timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 120},
+        "max_output_bytes": {"type": "integer", "minimum": 1000, "maximum": 2000000},
+        "network_enabled": {"const": false}
+      }
+    },
+    "reward_weights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool_discovery", "relevant_tool_selection", "evidence_gathering", "patch_correctness", "public_tests", "held_out_tests", "maintainability", "performance", "final_explanation"],
+      "properties": {
+        "tool_discovery": {"$ref": "#/$defs/weight"},
+        "relevant_tool_selection": {"$ref": "#/$defs/weight"},
+        "evidence_gathering": {"$ref": "#/$defs/weight"},
+        "patch_correctness": {"$ref": "#/$defs/weight"},
+        "public_tests": {"$ref": "#/$defs/weight"},
+        "held_out_tests": {"$ref": "#/$defs/weight"},
+        "maintainability": {"$ref": "#/$defs/weight"},
+        "performance": {"$ref": "#/$defs/weight"},
+        "final_explanation": {"$ref": "#/$defs/weight"}
+      }
+    }
+  },
+  "$defs": {
+    "classification": {"enum": ["accepted", "compile_error", "runtime_error", "test_failure", "hidden_test_failure", "contract_violation", "performance_regression", "incorrect_tool_use", "missing_evidence", "incomplete_task", "malformed_patch"]},
+    "command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "commands": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/command"}},
+    "weight": {"type": "number", "minimum": 0, "maximum": 1}
+  }
+}

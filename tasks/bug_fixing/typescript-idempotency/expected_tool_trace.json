@@ -1,0 +1,10 @@
+{
+  "calls": [
+    {"server":"issue_tracker","tool":"get_acceptance_criteria","arguments":{"task_id":"typescript-idempotency"}},
+    {"server":"documentation","tool":"search_docs","arguments":{"query":"distinct keys"}},
+    {"server":"repository","tool":"read_file","arguments":{"path":"idempotency.ts"}},
+    {"server":"database","tool":"query_context","arguments":{"query_name":"failure_history"}},
+    {"server":"test_runner","tool":"run_public_tests","arguments":{}}
+  ]
+}
+

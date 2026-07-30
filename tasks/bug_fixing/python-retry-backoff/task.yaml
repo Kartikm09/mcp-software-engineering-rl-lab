@@ -1,0 +1,46 @@
+schema_version: "1.0"
+id: python-retry-backoff
+title: Correct exponential retry backoff indexing
+language: python
+task_type: bug_fixing
+initial_prompt: The retry helper waits too long on its first attempt. Diagnose and repair the behavior without changing its public function signature.
+baseline_path: baseline
+public_tests_path: public_tests
+held_out_tests_path: held_out_tests
+golden_patch_path: golden/solution.patch
+incorrect_patch_paths: [incorrect_patches/linear-backoff.patch]
+expected_trace_path: expected_tool_trace.json
+required_tools:
+  - issue_tracker.get_acceptance_criteria
+  - repository.read_file
+  - documentation.search_docs
+  - test_runner.run_public_tests
+required_evidence: [acceptance criteria, baseline source, retry policy, public failure]
+hidden_information:
+  - The retry policy document defines attempt zero as the base delay.
+  - The acceptance criteria require preserving the public function signature.
+failure_categories: [accepted, test_failure, hidden_test_failure, contract_violation, incorrect_tool_use, missing_evidence, malformed_patch]
+allowed_changes: [retry.py]
+commands:
+  public:
+    - [$PYTHON, -m, unittest, test_public.py]
+  held_out:
+    - [$PYTHON, -m, unittest, test_held_out.py]
+  benchmark: []
+timeout_seconds: 20
+performance_threshold: null
+resource_limits:
+  max_tool_calls: 20
+  command_timeout_seconds: 20
+  max_output_bytes: 100000
+  network_enabled: false
+reward_weights:
+  tool_discovery: 0.05
+  relevant_tool_selection: 0.05
+  evidence_gathering: 0.10
+  patch_correctness: 0.25
+  public_tests: 0.15
+  held_out_tests: 0.20
+  maintainability: 0.05
+  performance: 0.10
+  final_explanation: 0.05

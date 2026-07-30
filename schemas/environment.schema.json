@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/mcp-rl/environment.schema.json",
+  "title": "MCP RL environment descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "language", "task_path", "toolchain", "network"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$"},
+    "language": {"enum": ["python", "java", "rust", "go", "typescript", "cpp"]},
+    "task_path": {"type": "string", "pattern": "^tasks/"},
+    "toolchain": {"type": "string", "minLength": 3},
+    "network": {"const": "disabled"}
+  }
+}

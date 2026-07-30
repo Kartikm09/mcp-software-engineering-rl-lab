@@ -1,0 +1,48 @@
+schema_version: "1.0"
+id: java-batch-window
+title: Add capacity introspection to a bounded batch window
+language: java
+task_type: feature_implementation
+initial_prompt: Add the requested batch-capacity feature while preserving the class's validation and bounded behavior.
+baseline_path: baseline
+public_tests_path: public_tests
+held_out_tests_path: held_out_tests
+golden_patch_path: golden/solution.patch
+incorrect_patch_paths: [incorrect_patches/off-by-one.patch]
+expected_trace_path: expected_tool_trace.json
+required_tools:
+  - issue_tracker.get_acceptance_criteria
+  - repository.read_file
+  - documentation.read_doc
+  - test_runner.run_public_tests
+required_evidence: [feature contract, source implementation, capacity policy, compiler evidence]
+hidden_information:
+  - The capacity contract defines remaining capacity as max size minus current size.
+  - Exact-capacity fills are valid but all later inserts must be rejected.
+failure_categories: [accepted, compile_error, test_failure, hidden_test_failure, contract_violation, incorrect_tool_use, missing_evidence, malformed_patch]
+allowed_changes: [src/BatchWindow.java]
+commands:
+  public:
+    - [$JAVAC, -d, build, src/BatchWindow.java, BatchWindowPublicTest.java]
+    - [$JAVA, -cp, build, BatchWindowPublicTest]
+  held_out:
+    - [$JAVAC, -d, build, src/BatchWindow.java, BatchWindowHeldOutTest.java]
+    - [$JAVA, -cp, build, BatchWindowHeldOutTest]
+  benchmark: []
+timeout_seconds: 30
+performance_threshold: null
+resource_limits:
+  max_tool_calls: 20
+  command_timeout_seconds: 30
+  max_output_bytes: 100000
+  network_enabled: false
+reward_weights:
+  tool_discovery: 0.05
+  relevant_tool_selection: 0.05
+  evidence_gathering: 0.10
+  patch_correctness: 0.25
+  public_tests: 0.15
+  held_out_tests: 0.20
+  maintainability: 0.05
+  performance: 0.10
+  final_explanation: 0.05

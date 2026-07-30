@@ -1,0 +1,7 @@
+schema_version: "1.0"
+id: go-performance-environment
+language: go
+task_path: tasks/performance_optimisation/go-dedupe-index
+toolchain: Go 1.23+
+network: disabled
+

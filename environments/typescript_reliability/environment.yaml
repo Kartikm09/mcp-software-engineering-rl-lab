@@ -1,0 +1,7 @@
+schema_version: "1.0"
+id: typescript-reliability-environment
+language: typescript
+task_path: tasks/bug_fixing/typescript-idempotency
+toolchain: Node.js 24 TypeScript type stripping
+network: disabled
+

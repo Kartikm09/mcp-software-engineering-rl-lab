@@ -1,0 +1,10 @@
+{
+  "calls": [
+    {"server":"issue_tracker","tool":"get_acceptance_criteria","arguments":{"task_id":"java-batch-window"}},
+    {"server":"documentation","tool":"read_doc","arguments":{"name":"batch-capacity-contract.md"}},
+    {"server":"repository","tool":"read_file","arguments":{"path":"src/BatchWindow.java"}},
+    {"server":"database","tool":"query_context","arguments":{"query_name":"task_constraints"}},
+    {"server":"test_runner","tool":"run_public_tests","arguments":{}}
+  ]
+}
+

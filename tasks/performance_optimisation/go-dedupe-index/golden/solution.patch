@@ -1,0 +1,31 @@
+diff --git a/dedupe.go b/dedupe.go
+--- a/dedupe.go
++++ b/dedupe.go
+@@ -2,19 +2,15 @@ package dedupe
+ 
+ func UniqueWithStats(values []string) ([]string, int) {
+ 	result := make([]string, 0, len(values))
+-	comparisons := 0
++	seen := make(map[string]struct{}, len(values))
++	checks := 0
+ 	for _, value := range values {
+-		duplicate := false
+-		for _, existing := range result {
+-			comparisons++
+-			if existing == value {
+-				duplicate = true
+-				break
+-			}
+-		}
+-		if !duplicate {
+-			result = append(result, value)
++		checks++
++		if _, exists := seen[value]; exists {
++			continue
+ 		}
++		seen[value] = struct{}{}
++		result = append(result, value)
+ 	}
+-	return result, comparisons
++	return result, checks
+ }

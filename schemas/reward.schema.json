@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/mcp-rl/reward.schema.json",
+  "title": "Transparent reward breakdown",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tool_discovery", "relevant_tool_selection", "evidence_gathering", "patch_correctness", "public_tests", "held_out_tests", "maintainability", "performance", "final_explanation", "total"],
+  "properties": {
+    "tool_discovery": {"$ref": "#/$defs/component"},
+    "relevant_tool_selection": {"$ref": "#/$defs/component"},
+    "evidence_gathering": {"$ref": "#/$defs/component"},
+    "patch_correctness": {"$ref": "#/$defs/component"},
+    "public_tests": {"$ref": "#/$defs/component"},
+    "held_out_tests": {"$ref": "#/$defs/component"},
+    "maintainability": {"$ref": "#/$defs/component"},
+    "performance": {"$ref": "#/$defs/component"},
+    "final_explanation": {"$ref": "#/$defs/component"},
+    "total": {"type": "number", "minimum": 0, "maximum": 100}
+  },
+  "$defs": {"component": {"type": "number", "minimum": 0, "maximum": 1}}
+}

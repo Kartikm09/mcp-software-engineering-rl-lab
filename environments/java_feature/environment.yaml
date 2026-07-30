@@ -1,0 +1,7 @@
+schema_version: "1.0"
+id: java-feature-environment
+language: java
+task_path: tasks/feature_implementation/java-batch-window
+toolchain: Java 25 compatible source
+network: disabled
+

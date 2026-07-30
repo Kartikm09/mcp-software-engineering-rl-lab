@@ -1,0 +1,48 @@
+schema_version: "1.0"
+id: rust-structured-limit-error
+title: Refactor stringly parsing failures into domain errors
+language: rust
+task_type: codebase_refactoring
+initial_prompt: Replace the parser's stringly typed error contract with a maintainable domain error while preserving valid parsing behavior.
+baseline_path: baseline
+public_tests_path: public_tests
+held_out_tests_path: held_out_tests
+golden_patch_path: golden/solution.patch
+incorrect_patch_paths: [incorrect_patches/collapsed-error.patch]
+expected_trace_path: expected_tool_trace.json
+required_tools:
+  - issue_tracker.get_acceptance_criteria
+  - repository.read_file
+  - documentation.search_docs
+  - test_runner.run_public_tests
+required_evidence: [error contract, baseline parser, CLI wording, compiler evidence]
+hidden_information:
+  - The documented public contract distinguishes malformed integers from out-of-range values.
+  - Display text is part of the CLI compatibility contract.
+failure_categories: [accepted, compile_error, test_failure, hidden_test_failure, contract_violation, incorrect_tool_use, missing_evidence, malformed_patch]
+allowed_changes: [src/lib.rs]
+commands:
+  public:
+    - [$RUSTC, --edition=2024, --test, public_test.rs, -o, build/rust-public]
+    - [build/rust-public]
+  held_out:
+    - [$RUSTC, --edition=2024, --test, held_out_test.rs, -o, build/rust-held]
+    - [build/rust-held]
+  benchmark: []
+timeout_seconds: 30
+performance_threshold: null
+resource_limits:
+  max_tool_calls: 20
+  command_timeout_seconds: 30
+  max_output_bytes: 100000
+  network_enabled: false
+reward_weights:
+  tool_discovery: 0.05
+  relevant_tool_selection: 0.05
+  evidence_gathering: 0.10
+  patch_correctness: 0.25
+  public_tests: 0.15
+  held_out_tests: 0.20
+  maintainability: 0.05
+  performance: 0.10
+  final_explanation: 0.05

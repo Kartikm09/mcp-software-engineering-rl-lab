@@ -1,0 +1,11 @@
+{
+  "calls": [
+    {"server":"issue_tracker","tool":"get_issue","arguments":{"task_id":"python-retry-backoff"}},
+    {"server":"issue_tracker","tool":"get_acceptance_criteria","arguments":{"task_id":"python-retry-backoff"}},
+    {"server":"documentation","tool":"search_docs","arguments":{"query":"backoff"}},
+    {"server":"repository","tool":"read_file","arguments":{"path":"retry.py"}},
+    {"server":"database","tool":"query_context","arguments":{"query_name":"failure_history"}},
+    {"server":"test_runner","tool":"run_public_tests","arguments":{}}
+  ]
+}
+

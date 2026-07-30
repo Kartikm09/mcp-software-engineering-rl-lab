@@ -1,0 +1,10 @@
+{
+  "calls": [
+    {"server":"issue_tracker","tool":"get_acceptance_criteria","arguments":{"task_id":"rust-structured-limit-error"}},
+    {"server":"documentation","tool":"search_docs","arguments":{"query":"error contract"}},
+    {"server":"repository","tool":"read_file","arguments":{"path":"src/lib.rs"}},
+    {"server":"database","tool":"query_context","arguments":{"query_name":"failure_history"}},
+    {"server":"test_runner","tool":"run_public_tests","arguments":{}}
+  ]
+}
+

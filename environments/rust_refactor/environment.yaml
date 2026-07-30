@@ -1,0 +1,7 @@
+schema_version: "1.0"
+id: rust-refactor-environment
+language: rust
+task_path: tasks/codebase_refactoring/rust-structured-limit-error
+toolchain: Rust edition 2024
+network: disabled
+

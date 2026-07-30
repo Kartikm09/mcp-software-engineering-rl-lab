@@ -1,0 +1,16 @@
+diff --git a/src/BatchWindow.java b/src/BatchWindow.java
+--- a/src/BatchWindow.java
++++ b/src/BatchWindow.java
+@@ -11,4 +11,11 @@ public final class BatchWindow {
+     public boolean canAccept(int currentSize, int requested) {
+         return currentSize >= 0 && requested > 0 && currentSize + requested < maxSize;
+     }
++
++    public int remainingCapacity(int currentSize) {
++        if (currentSize < 0 || currentSize > maxSize) {
++            throw new IllegalArgumentException("currentSize is outside the batch window");
++        }
++        return maxSize - currentSize;
++    }
+ }
+

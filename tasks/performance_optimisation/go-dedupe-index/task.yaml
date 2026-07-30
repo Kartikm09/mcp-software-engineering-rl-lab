@@ -1,0 +1,47 @@
+schema_version: "1.0"
+id: go-dedupe-index
+title: Remove quadratic duplicate checks while preserving order
+language: go
+task_type: performance_optimisation
+initial_prompt: Improve the hot-path duplicate filter without changing its output order or public function signature.
+baseline_path: baseline
+public_tests_path: public_tests
+held_out_tests_path: held_out_tests
+golden_patch_path: golden/solution.patch
+incorrect_patch_paths: [incorrect_patches/sorted-map.patch]
+expected_trace_path: expected_tool_trace.json
+required_tools:
+  - issue_tracker.get_acceptance_criteria
+  - repository.read_file
+  - documentation.search_docs
+  - benchmark.run_baseline_benchmark
+required_evidence: [order contract, baseline complexity, deterministic work metric, benchmark evidence]
+hidden_information:
+  - The output must preserve first-seen order rather than map or sorted order.
+  - The deterministic check counter is the acceptance gate; wall-clock time is supporting evidence.
+failure_categories: [accepted, compile_error, test_failure, hidden_test_failure, performance_regression, contract_violation, incorrect_tool_use, missing_evidence, malformed_patch]
+allowed_changes: [dedupe.go]
+commands:
+  public:
+    - [$GO, test, ./...]
+  held_out:
+    - [$GO, test, ./...]
+  benchmark:
+    - [$GO, test, -run, ^$, -bench, BenchmarkUnique, -benchtime=100x]
+timeout_seconds: 45
+performance_threshold: Membership checks must be no greater than the input length; wall-clock output is supporting evidence only.
+resource_limits:
+  max_tool_calls: 24
+  command_timeout_seconds: 45
+  max_output_bytes: 150000
+  network_enabled: false
+reward_weights:
+  tool_discovery: 0.05
+  relevant_tool_selection: 0.05
+  evidence_gathering: 0.10
+  patch_correctness: 0.20
+  public_tests: 0.15
+  held_out_tests: 0.20
+  maintainability: 0.05
+  performance: 0.15
+  final_explanation: 0.05

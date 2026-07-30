@@ -1,0 +1,32 @@
+diff --git a/idempotency.ts b/idempotency.ts
+--- a/idempotency.ts
++++ b/idempotency.ts
+@@ -1,5 +1,6 @@
+ export class IdempotencyGate<T> {
+   private readonly completed = new Map<string, T>();
++  private inFlight: Promise<T> | undefined;
+ 
+   async run(key: string, operation: () => Promise<T>): Promise<T> {
+     const completed = this.completed.get(key);
+@@ -7,8 +8,17 @@ export class IdempotencyGate<T> {
+       return completed;
+     }
+ 
+-    const value = await operation();
+-    this.completed.set(key, value);
+-    return value;
++    if (this.inFlight !== undefined) {
++      return this.inFlight;
++    }
++    this.inFlight = operation().then((value) => {
++      this.completed.set(key, value);
++      return value;
++    });
++    try {
++      return await this.inFlight;
++    } finally {
++      this.inFlight = undefined;
++    }
+   }
+ }
+

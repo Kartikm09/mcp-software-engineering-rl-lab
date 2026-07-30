@@ -1,0 +1,7 @@
+schema_version: "1.0"
+id: python-bugfix-environment
+language: python
+task_path: tasks/bug_fixing/python-retry-backoff
+toolchain: Python 3.11+
+network: disabled
+

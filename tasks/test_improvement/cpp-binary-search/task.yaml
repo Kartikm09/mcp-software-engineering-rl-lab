@@ -1,0 +1,48 @@
+schema_version: "1.0"
+id: cpp-binary-search
+title: Correct binary-search boundary handling
+language: cpp
+task_type: algorithmic_correction
+initial_prompt: Repair the sorted-vector lookup so valid boundary elements are found and absent values remain absent.
+baseline_path: baseline
+public_tests_path: public_tests
+held_out_tests_path: held_out_tests
+golden_patch_path: golden/solution.patch
+incorrect_patch_paths: [incorrect_patches/insertion-index.patch]
+expected_trace_path: expected_tool_trace.json
+required_tools:
+  - issue_tracker.get_acceptance_criteria
+  - repository.read_file
+  - documentation.search_docs
+  - test_runner.run_public_tests
+required_evidence: [boundary contract, baseline implementation, empty-input rule, compiler evidence]
+hidden_information:
+  - The search interval is half-open and must support empty input safely.
+  - Returning an insertion index for an absent value violates the boolean contract.
+failure_categories: [accepted, compile_error, test_failure, hidden_test_failure, contract_violation, incorrect_tool_use, missing_evidence, malformed_patch]
+allowed_changes: [src/binary_search.cpp]
+commands:
+  public:
+    - [$CLANGXX, -std=c++20, -Wall, -Wextra, -Werror, src/binary_search.cpp, binary_search_public_test.cpp, -o, build/cpp-public]
+    - [build/cpp-public]
+  held_out:
+    - [$CLANGXX, -std=c++20, -Wall, -Wextra, -Werror, src/binary_search.cpp, binary_search_held_out_test.cpp, -o, build/cpp-held]
+    - [build/cpp-held]
+  benchmark: []
+timeout_seconds: 30
+performance_threshold: null
+resource_limits:
+  max_tool_calls: 20
+  command_timeout_seconds: 30
+  max_output_bytes: 100000
+  network_enabled: false
+reward_weights:
+  tool_discovery: 0.05
+  relevant_tool_selection: 0.05
+  evidence_gathering: 0.10
+  patch_correctness: 0.25
+  public_tests: 0.15
+  held_out_tests: 0.20
+  maintainability: 0.05
+  performance: 0.10
+  final_explanation: 0.05

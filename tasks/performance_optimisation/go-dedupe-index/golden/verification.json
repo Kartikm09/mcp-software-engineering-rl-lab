@@ -1,0 +1,2 @@
+{"classification":"accepted","changed_files":["dedupe.go"],"work_metric":"checks <= input length","complexity_before":"O(n^2)","complexity_after":"O(n)"}
+

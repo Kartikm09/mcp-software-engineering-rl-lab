@@ -1,0 +1,30 @@
+diff --git a/src/lib.rs b/src/lib.rs
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,9 +1,23 @@
+-pub fn parse_limit(raw: &str) -> Result<u32, String> {
++use std::fmt;
++
++#[derive(Debug, PartialEq, Eq)]
++pub enum ParseLimitError {
++    NotNumber,
++    OutOfRange,
++}
++
++impl fmt::Display for ParseLimitError {
++    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
++        formatter.write_str("limit must be a number")
++    }
++}
++
++pub fn parse_limit(raw: &str) -> Result<u32, ParseLimitError> {
+     let value = raw
+         .parse::<u32>()
+-        .map_err(|_| "limit must be a number".to_string())?;
++        .map_err(|_| ParseLimitError::NotNumber)?;
+     if value == 0 || value > 1000 {
+-        return Err("limit must be between 1 and 1000".to_string());
++        return Err(ParseLimitError::NotNumber);
+     }
+     Ok(value)
+ }

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/mcp-rl/tool_trace.schema.json",
+  "title": "Expected MCP tool-use trace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["calls"],
+  "properties": {
+    "calls": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["server", "tool", "arguments"],
+        "properties": {
+          "server": {"enum": ["repository", "issue_tracker", "documentation", "test_runner", "benchmark", "database"]},
+          "tool": {"type": "string", "pattern": "^[a-z_]+$"},
+          "arguments": {"type": "object"}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "python-retry-backoff": {
+    "title": "First retry waits twice the configured base",
+    "body": "The retry helper uses one-based attempt numbers. Preserve validation and the existing cap.",
+    "acceptance_criteria": ["attempt 1 equals base", "later attempts double", "invalid values still raise"]
+  },
+  "java-batch-window": {
+    "title": "Expose remaining batch capacity",
+    "body": "Consumers need an immutable capacity query and exact-fill acceptance.",
+    "acceptance_criteria": ["add remainingCapacity", "exact fill is accepted", "invalid current sizes raise"]
+  },
+  "rust-structured-limit-error": {
+    "title": "Replace free-form parser errors",
+    "body": "Downstream code needs exhaustive error categories while CLI wording remains stable.",
+    "acceptance_criteria": ["NotNumber and OutOfRange variants", "stable Display messages", "no panic or unsafe"]
+  },
+  "go-dedupe-index": {
+    "title": "Remove quadratic duplicate checks",
+    "body": "Preserve first-occurrence order and expose a deterministic membership-check count.",
+    "acceptance_criteria": ["O(n) expected work", "input order preserved", "checks no greater than input length"]
+  },
+  "typescript-idempotency": {
+    "title": "Duplicate side effects under concurrent idempotency keys",
+    "body": "Coalesce equivalent in-flight work without globally serializing unrelated keys.",
+    "acceptance_criteria": ["one operation per same key", "distinct keys remain independent", "failed work can retry"]
+  },
+  "cpp-binary-search": {
+    "title": "Sorted lookup misses boundary values",
+    "body": "Use a consistent interval and distinguish insertion position from an actual match.",
+    "acceptance_criteria": ["find boundaries", "absent values return -1", "empty input is safe", "O(log n) time"]
+  }
+}
+
