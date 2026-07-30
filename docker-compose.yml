@@ -1,0 +1,9 @@
+services:
+  lab:
+    build: .
+    command: ["catalogue"]
+    read_only: true
+    network_mode: none
+    tmpfs:
+      - /tmp
+

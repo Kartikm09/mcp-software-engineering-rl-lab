@@ -1,0 +1,8 @@
+# Changelog
+
+## 0.1.0 - 2026-07-30
+
+- Added six local MCP servers for repository, issue, documentation, test, benchmark, and database discovery.
+- Added six synthetic engineering tasks across Python, Java, Rust, Go, TypeScript, and C++.
+- Added isolated candidate workspaces, safe patch application, deterministic verification, reward scoring, episode reports, golden patches, and negative controls.
+
