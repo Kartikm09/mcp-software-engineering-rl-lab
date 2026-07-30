@@ -1,0 +1,224 @@
+{
+  "schema_version": "1.0",
+  "episode_id": "episode-aeb327a0f5cf",
+  "task_id": "python-retry-backoff",
+  "initial_prompt": "The retry helper waits too long on its first attempt. Diagnose and repair the behavior without changing its public function signature.",
+  "available_servers": [
+    "repository",
+    "issue_tracker",
+    "documentation",
+    "test_runner",
+    "benchmark",
+    "database"
+  ],
+  "tool_trace": [
+    {
+      "sequence": 1,
+      "call": {
+        "server": "issue_tracker",
+        "tool": "get_issue",
+        "arguments": {
+          "task_id": "python-retry-backoff"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "task_id": "python-retry-backoff",
+          "title": "First retry waits twice the configured base",
+          "body": "The retry helper uses one-based attempt numbers. Preserve validation and the existing cap."
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 2,
+      "call": {
+        "server": "issue_tracker",
+        "tool": "get_acceptance_criteria",
+        "arguments": {
+          "task_id": "python-retry-backoff"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "task_id": "python-retry-backoff",
+          "acceptance_criteria": [
+            "attempt 1 equals base",
+            "later attempts double",
+            "invalid values still raise"
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 3,
+      "call": {
+        "server": "documentation",
+        "tool": "search_docs",
+        "arguments": {
+          "query": "backoff"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "matches": [
+            {
+              "document": "retry-policy.md",
+              "line": 3,
+              "text": "The attempt counter is one-based. Exponential backoff therefore uses `base * 2^(attempt - 1)` and applies the cap after calculating the delay. Invalid attempt, base, or cap values are rejected rather than corrected silently."
+            }
+          ],
+          "truncated": false
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 1
+    },
+    {
+      "sequence": 4,
+      "call": {
+        "server": "repository",
+        "tool": "read_file",
+        "arguments": {
+          "path": "retry.py"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "path": "retry.py",
+          "text": "\"\"\"Retry timing used by a synthetic local worker.\"\"\"\n\n\ndef backoff_delay(attempt: int, base: int = 1, cap: int = 16) -> int:\n    if attempt < 1:\n        raise ValueError(\"attempt must be at least 1\")\n    if base < 1 or cap < 1:\n        raise ValueError(\"base and cap must be positive\")\n    return min(cap, base * (2**attempt))\n"
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 5,
+      "call": {
+        "server": "database",
+        "tool": "query_context",
+        "arguments": {
+          "query_name": "failure_history"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "query_name": "failure_history",
+          "rows": [
+            [
+              "boundary",
+              "attempt 1 observed at twice the configured base"
+            ]
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 3
+    },
+    {
+      "sequence": 6,
+      "call": {
+        "server": "test_runner",
+        "tool": "run_public_tests",
+        "arguments": {}
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "suite": "public",
+          "commands": [
+            {
+              "command": [
+                "$PYTHON",
+                "-m",
+                "unittest",
+                "test_public.py"
+              ],
+              "exit_code": 1,
+              "duration_ms": 43,
+              "stdout": "",
+              "stderr": "FF\n======================================================================\nFAIL: test_first_attempt_uses_base_delay (test_public.RetryBackoffPublicTests.test_first_attempt_uses_base_delay)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/84/jqrx8jc14vv0c4ktg8kyny280000gn/T/mcp-rl-python-retry-backoff-o2e45fkl/candidate/test_public.py\", line 8, in test_first_attempt_uses_base_delay\n    self.assertEqual(backoff_delay(1, base=2, cap=20), 2)\nAssertionError: 4 != 2\n\n======================================================================\nFAIL: test_second_attempt_doubles (test_public.RetryBackoffPublicTests.test_second_attempt_doubles)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/84/jqrx8jc14vv0c4ktg8kyny280000gn/T/mcp-rl-python-retry-backoff-o2e45fkl/candidate/test_public.py\", line 11, in test_second_attempt_doubles\n    self.assertEqual(backoff_delay(2, base=2, cap=20), 4)\nAssertionError: 8 != 4\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nFAILED (failures=2)\n",
+              "timed_out": false,
+              "output_truncated": false
+            }
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 195
+    }
+  ],
+  "patch_sha256": "006da7cdf7a05ad6467c6662c779117b449276694b1e2315d10f82d06220b5b9",
+  "final_explanation": "The implementation treated the one-based attempt number as a zero-based exponent, so attempt 1 used `base * 2`. Subtracting one preserves exponential growth and the existing cap while keeping validation and the public API unchanged. The patch changes one expression and has constant time and space complexity.",
+  "verification": {
+    "classification": "accepted",
+    "accepted": true,
+    "changed_files": [
+      "retry.py"
+    ],
+    "public_results": [
+      {
+        "command": [
+          "$PYTHON",
+          "-m",
+          "unittest",
+          "test_public.py"
+        ],
+        "exit_code": 0,
+        "duration_ms": 39,
+        "stdout": "",
+        "stderr": "..\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "held_out_results": [
+      {
+        "command": [
+          "$PYTHON",
+          "-m",
+          "unittest",
+          "test_held_out.py"
+        ],
+        "exit_code": 0,
+        "duration_ms": 37,
+        "stdout": "",
+        "stderr": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK\n",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "benchmark_results": [],
+    "errors": [],
+    "candidate_workspace_exclusions_verified": true,
+    "duration_ms": 231
+  },
+  "reward": {
+    "tool_discovery": 1.0,
+    "relevant_tool_selection": 1.0,
+    "evidence_gathering": 1.0,
+    "patch_correctness": 1.0,
+    "public_tests": 1.0,
+    "held_out_tests": 1.0,
+    "maintainability": 1.0,
+    "performance": 1.0,
+    "final_explanation": 1.0,
+    "total": 100.0
+  },
+  "started_at": "2026-07-30T00:00:00Z",
+  "completed_at": "2026-07-30T00:00:00Z"
+}

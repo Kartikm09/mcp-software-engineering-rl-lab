@@ -1,0 +1,222 @@
+{
+  "schema_version": "1.0",
+  "episode_id": "episode-bdecd03cfc67",
+  "task_id": "go-dedupe-index",
+  "initial_prompt": "Improve the hot-path duplicate filter without changing its output order or public function signature.",
+  "available_servers": [
+    "repository",
+    "issue_tracker",
+    "documentation",
+    "test_runner",
+    "benchmark",
+    "database"
+  ],
+  "tool_trace": [
+    {
+      "sequence": 1,
+      "call": {
+        "server": "issue_tracker",
+        "tool": "get_acceptance_criteria",
+        "arguments": {
+          "task_id": "go-dedupe-index"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "task_id": "go-dedupe-index",
+          "acceptance_criteria": [
+            "O(n) expected work",
+            "input order preserved",
+            "checks no greater than input length"
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 2,
+      "call": {
+        "server": "documentation",
+        "tool": "search_docs",
+        "arguments": {
+          "query": "first-occurrence order"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "matches": [
+            {
+              "document": "dedupe-order-contract.md",
+              "line": 3,
+              "text": "The first-occurrence order is part of the public result. A set may support membership checks, but output must still append values as they are first observed. The deterministic work metric counts one membership check per input."
+            }
+          ],
+          "truncated": false
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 3,
+      "call": {
+        "server": "repository",
+        "tool": "read_file",
+        "arguments": {
+          "path": "dedupe.go"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "path": "dedupe.go",
+          "text": "package dedupe\n\nfunc UniqueWithStats(values []string) ([]string, int) {\n\tresult := make([]string, 0, len(values))\n\tcomparisons := 0\n\tfor _, value := range values {\n\t\tduplicate := false\n\t\tfor _, existing := range result {\n\t\t\tcomparisons++\n\t\t\tif existing == value {\n\t\t\t\tduplicate = true\n\t\t\t\tbreak\n\t\t\t}\n\t\t}\n\t\tif !duplicate {\n\t\t\tresult = append(result, value)\n\t\t}\n\t}\n\treturn result, comparisons\n}\n\n"
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 4,
+      "call": {
+        "server": "database",
+        "tool": "query_context",
+        "arguments": {
+          "query_name": "failure_history"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "query_name": "failure_history",
+          "rows": [
+            [
+              "performance",
+              "unique batches caused quadratic comparisons"
+            ]
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 5,
+      "call": {
+        "server": "benchmark",
+        "tool": "run_baseline_benchmark",
+        "arguments": {}
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "available": true,
+          "commands": [
+            {
+              "command": [
+                "$GO",
+                "test",
+                "-run",
+                "^$",
+                "-bench",
+                "BenchmarkUnique",
+                "-benchtime=100x"
+              ],
+              "exit_code": 0,
+              "duration_ms": 4555,
+              "stdout": "PASS\nok  \texample.invalid/mcprl/dedupe\t0.343s\n",
+              "stderr": "",
+              "timed_out": false,
+              "output_truncated": false
+            }
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 4751
+    }
+  ],
+  "patch_sha256": "23a1c9cc99d58e570ca84812d73e534c47ba1111c2fca299ea12b40a7caaf515",
+  "final_explanation": "The nested scan made worst-case work quadratic in the number of unique values. A local set provides one membership check per input while appending only on the first occurrence, so order remains stable. Expected work becomes O(n) time with O(n) additional space. The deterministic check count is the CI threshold; benchmark timing is recorded but remains machine-dependent.",
+  "verification": {
+    "classification": "accepted",
+    "accepted": true,
+    "changed_files": [
+      "dedupe.go"
+    ],
+    "public_results": [
+      {
+        "command": [
+          "$GO",
+          "test",
+          "./..."
+        ],
+        "exit_code": 0,
+        "duration_ms": 4475,
+        "stdout": "ok  \texample.invalid/mcprl/dedupe\t0.340s\n",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "held_out_results": [
+      {
+        "command": [
+          "$GO",
+          "test",
+          "./..."
+        ],
+        "exit_code": 0,
+        "duration_ms": 570,
+        "stdout": "ok  \texample.invalid/mcprl/dedupe\t0.342s\n",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "benchmark_results": [
+      {
+        "command": [
+          "$GO",
+          "test",
+          "-run",
+          "^$",
+          "-bench",
+          "BenchmarkUnique",
+          "-benchtime=100x"
+        ],
+        "exit_code": 0,
+        "duration_ms": 253,
+        "stdout": "goos: darwin\ngoarch: arm64\npkg: example.invalid/mcprl/dedupe\ncpu: Apple M1\nBenchmarkUnique-8   \t     100\t     17332 ns/op\nPASS\nok  \texample.invalid/mcprl/dedupe\t0.090s\n",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "errors": [],
+    "candidate_workspace_exclusions_verified": true,
+    "duration_ms": 5576
+  },
+  "reward": {
+    "tool_discovery": 1.0,
+    "relevant_tool_selection": 1.0,
+    "evidence_gathering": 1.0,
+    "patch_correctness": 1.0,
+    "public_tests": 1.0,
+    "held_out_tests": 1.0,
+    "maintainability": 1.0,
+    "performance": 1.0,
+    "final_explanation": 1.0,
+    "total": 100.0
+  },
+  "started_at": "2026-07-30T00:00:00Z",
+  "completed_at": "2026-07-30T00:00:00Z"
+}

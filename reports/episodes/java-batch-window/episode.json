@@ -1,0 +1,228 @@
+{
+  "schema_version": "1.0",
+  "episode_id": "episode-14763d4dd0d4",
+  "task_id": "java-batch-window",
+  "initial_prompt": "Add the requested batch-capacity feature while preserving the class's validation and bounded behavior.",
+  "available_servers": [
+    "repository",
+    "issue_tracker",
+    "documentation",
+    "test_runner",
+    "benchmark",
+    "database"
+  ],
+  "tool_trace": [
+    {
+      "sequence": 1,
+      "call": {
+        "server": "issue_tracker",
+        "tool": "get_acceptance_criteria",
+        "arguments": {
+          "task_id": "java-batch-window"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "task_id": "java-batch-window",
+          "acceptance_criteria": [
+            "add remainingCapacity",
+            "exact fill is accepted",
+            "invalid current sizes raise"
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 2,
+      "call": {
+        "server": "documentation",
+        "tool": "read_doc",
+        "arguments": {
+          "name": "batch-capacity-contract.md"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "name": "batch-capacity-contract.md",
+          "text": "# Batch Capacity Contract\n\nA positive request may exactly fill the configured maximum. `remainingCapacity` returns `max - current`, including zero at full capacity, and rejects impossible current sizes.\n\n"
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 3,
+      "call": {
+        "server": "repository",
+        "tool": "read_file",
+        "arguments": {
+          "path": "src/BatchWindow.java"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "path": "src/BatchWindow.java",
+          "text": "public final class BatchWindow {\n    private final int maxSize;\n\n    public BatchWindow(int maxSize) {\n        if (maxSize < 1) {\n            throw new IllegalArgumentException(\"maxSize must be positive\");\n        }\n        this.maxSize = maxSize;\n    }\n\n    public boolean canAccept(int currentSize, int requested) {\n        return currentSize >= 0 && requested > 0 && currentSize + requested < maxSize;\n    }\n}\n\n"
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 4,
+      "call": {
+        "server": "database",
+        "tool": "query_context",
+        "arguments": {
+          "query_name": "task_constraints"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "query_name": "task_constraints",
+          "rows": [
+            [
+              "exact_fill",
+              "allowed"
+            ]
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 5,
+      "call": {
+        "server": "test_runner",
+        "tool": "run_public_tests",
+        "arguments": {}
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "suite": "public",
+          "commands": [
+            {
+              "command": [
+                "$JAVAC",
+                "-d",
+                "build",
+                "src/BatchWindow.java",
+                "BatchWindowPublicTest.java"
+              ],
+              "exit_code": 1,
+              "duration_ms": 540,
+              "stdout": "",
+              "stderr": "BatchWindowPublicTest.java:4: error: cannot find symbol\n        if (window.remainingCapacity(4) != 6) {\n                  ^\n  symbol:   method remainingCapacity(int)\n  location: variable window of type BatchWindow\n1 error\n",
+              "timed_out": false,
+              "output_truncated": false
+            }
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 649
+    }
+  ],
+  "patch_sha256": "5e3c1dbd233a4944dda41d1fe7d80468d80640282f3c4593aa33f965d9f35e99",
+  "final_explanation": "The feature derives remaining capacity from the immutable maximum and validates impossible current states. The existing acceptance predicate used a strict comparison, incorrectly rejecting a request that exactly filled the batch; changing it to `<=` matches the discovered contract. All operations remain O(1), allocation-free, and thread-safe.",
+  "verification": {
+    "classification": "accepted",
+    "accepted": true,
+    "changed_files": [
+      "src/BatchWindow.java"
+    ],
+    "public_results": [
+      {
+        "command": [
+          "$JAVAC",
+          "-d",
+          "build",
+          "src/BatchWindow.java",
+          "BatchWindowPublicTest.java"
+        ],
+        "exit_code": 0,
+        "duration_ms": 292,
+        "stdout": "",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      },
+      {
+        "command": [
+          "$JAVA",
+          "-cp",
+          "build",
+          "BatchWindowPublicTest"
+        ],
+        "exit_code": 0,
+        "duration_ms": 29,
+        "stdout": "",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "held_out_results": [
+      {
+        "command": [
+          "$JAVAC",
+          "-d",
+          "build",
+          "src/BatchWindow.java",
+          "BatchWindowHeldOutTest.java"
+        ],
+        "exit_code": 0,
+        "duration_ms": 294,
+        "stdout": "",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      },
+      {
+        "command": [
+          "$JAVA",
+          "-cp",
+          "build",
+          "BatchWindowHeldOutTest"
+        ],
+        "exit_code": 0,
+        "duration_ms": 28,
+        "stdout": "",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "benchmark_results": [],
+    "errors": [],
+    "candidate_workspace_exclusions_verified": true,
+    "duration_ms": 799
+  },
+  "reward": {
+    "tool_discovery": 1.0,
+    "relevant_tool_selection": 1.0,
+    "evidence_gathering": 1.0,
+    "patch_correctness": 1.0,
+    "public_tests": 1.0,
+    "held_out_tests": 1.0,
+    "maintainability": 1.0,
+    "performance": 1.0,
+    "final_explanation": 1.0,
+    "total": 100.0
+  },
+  "started_at": "2026-07-30T00:00:00Z",
+  "completed_at": "2026-07-30T00:00:00Z"
+}

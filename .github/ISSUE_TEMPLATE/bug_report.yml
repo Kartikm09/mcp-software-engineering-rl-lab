@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible evaluator, MCP tool, or task-package defect.
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, private code, or undisclosed benchmark material.
+  - type: input
+    id: task
+    attributes:
+      label: Task or module
+      placeholder: python-retry-backoff or src/mcp_rl_lab/verifier.py
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Include the exact local command and synthetic input.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed and expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Toolchain versions
+    validations:
+      required: true

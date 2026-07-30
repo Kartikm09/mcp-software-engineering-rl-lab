@@ -1,0 +1,252 @@
+{
+  "schema_version": "1.0",
+  "episode_id": "episode-95acc6ae4438",
+  "task_id": "cpp-binary-search",
+  "initial_prompt": "Repair the sorted-vector lookup so valid boundary elements are found and absent values remain absent.",
+  "available_servers": [
+    "repository",
+    "issue_tracker",
+    "documentation",
+    "test_runner",
+    "benchmark",
+    "database"
+  ],
+  "tool_trace": [
+    {
+      "sequence": 1,
+      "call": {
+        "server": "issue_tracker",
+        "tool": "get_acceptance_criteria",
+        "arguments": {
+          "task_id": "cpp-binary-search"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "task_id": "cpp-binary-search",
+          "acceptance_criteria": [
+            "find boundaries",
+            "absent values return -1",
+            "empty input is safe",
+            "O(log n) time"
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 2,
+      "call": {
+        "server": "documentation",
+        "tool": "search_docs",
+        "arguments": {
+          "query": "half-open interval"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "matches": [
+            {
+              "document": "binary-search-contract.md",
+              "line": 3,
+              "text": "A half-open interval `[low, high)` avoids unsigned underflow and supports empty input. The final insertion position is returned only when it is in range and the value equals the target."
+            }
+          ],
+          "truncated": false
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 3,
+      "call": {
+        "server": "repository",
+        "tool": "read_file",
+        "arguments": {
+          "path": "src/binary_search.cpp"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "path": "src/binary_search.cpp",
+          "text": "#include \"binary_search.hpp\"\n\nint index_of(const std::vector<int>& values, int target) {\n    if (values.empty()) {\n        return -1;\n    }\n    std::size_t low = 0;\n    std::size_t high = values.size() - 1;\n    while (low < high) {\n        const std::size_t middle = low + (high - low) / 2;\n        if (values[middle] < target) {\n            low = middle + 1;\n        } else {\n            high = middle - 1;\n        }\n    }\n    return values[low] == target ? static_cast<int>(low) : -1;\n}\n\n"
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 4,
+      "call": {
+        "server": "database",
+        "tool": "query_context",
+        "arguments": {
+          "query_name": "failure_history"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "query_name": "failure_history",
+          "rows": [
+            [
+              "boundary",
+              "existing values near interval edges were missed"
+            ]
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 5,
+      "call": {
+        "server": "test_runner",
+        "tool": "run_public_tests",
+        "arguments": {}
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "suite": "public",
+          "commands": [
+            {
+              "command": [
+                "$CLANGXX",
+                "-std=c++20",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "src/binary_search.cpp",
+                "binary_search_public_test.cpp",
+                "-o",
+                "build/cpp-public"
+              ],
+              "exit_code": 0,
+              "duration_ms": 1192,
+              "stdout": "",
+              "stderr": "",
+              "timed_out": false,
+              "output_truncated": false
+            },
+            {
+              "command": [
+                "build/cpp-public"
+              ],
+              "exit_code": -11,
+              "duration_ms": 75,
+              "stdout": "",
+              "stderr": "",
+              "timed_out": false,
+              "output_truncated": false
+            }
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 1374
+    }
+  ],
+  "patch_sha256": "77d6277f589493f3cae17d8fdca5a6126cb5b3916263b5edaee2baa231fc7d92",
+  "final_explanation": "The baseline mixed an inclusive upper bound with lower-bound updates, which can skip a candidate and underflow when moving left. A half-open `[low, high)` interval keeps every update valid, naturally supports empty input, and verifies equality before returning the insertion position. Complexity remains O(log n) time and O(1) space.",
+  "verification": {
+    "classification": "accepted",
+    "accepted": true,
+    "changed_files": [
+      "src/binary_search.cpp"
+    ],
+    "public_results": [
+      {
+        "command": [
+          "$CLANGXX",
+          "-std=c++20",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "src/binary_search.cpp",
+          "binary_search_public_test.cpp",
+          "-o",
+          "build/cpp-public"
+        ],
+        "exit_code": 0,
+        "duration_ms": 784,
+        "stdout": "",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      },
+      {
+        "command": [
+          "build/cpp-public"
+        ],
+        "exit_code": 0,
+        "duration_ms": 48,
+        "stdout": "",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "held_out_results": [
+      {
+        "command": [
+          "$CLANGXX",
+          "-std=c++20",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "src/binary_search.cpp",
+          "binary_search_held_out_test.cpp",
+          "-o",
+          "build/cpp-held"
+        ],
+        "exit_code": 0,
+        "duration_ms": 730,
+        "stdout": "",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      },
+      {
+        "command": [
+          "build/cpp-held"
+        ],
+        "exit_code": 0,
+        "duration_ms": 44,
+        "stdout": "",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "benchmark_results": [],
+    "errors": [],
+    "candidate_workspace_exclusions_verified": true,
+    "duration_ms": 1766
+  },
+  "reward": {
+    "tool_discovery": 1.0,
+    "relevant_tool_selection": 1.0,
+    "evidence_gathering": 1.0,
+    "patch_correctness": 1.0,
+    "public_tests": 1.0,
+    "held_out_tests": 1.0,
+    "maintainability": 1.0,
+    "performance": 1.0,
+    "final_explanation": 1.0,
+    "total": 100.0
+  },
+  "started_at": "2026-07-30T00:00:00Z",
+  "completed_at": "2026-07-30T00:00:00Z"
+}

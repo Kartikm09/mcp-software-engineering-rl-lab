@@ -1,0 +1,200 @@
+{
+  "schema_version": "1.0",
+  "episode_id": "episode-06f52dbaddcc",
+  "task_id": "typescript-idempotency",
+  "initial_prompt": "Concurrent calls with the same idempotency key trigger duplicate synthetic side effects. Repair the race without globally serializing unrelated keys.",
+  "available_servers": [
+    "repository",
+    "issue_tracker",
+    "documentation",
+    "test_runner",
+    "benchmark",
+    "database"
+  ],
+  "tool_trace": [
+    {
+      "sequence": 1,
+      "call": {
+        "server": "issue_tracker",
+        "tool": "get_acceptance_criteria",
+        "arguments": {
+          "task_id": "typescript-idempotency"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "task_id": "typescript-idempotency",
+          "acceptance_criteria": [
+            "one operation per same key",
+            "distinct keys remain independent",
+            "failed work can retry"
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 2,
+      "call": {
+        "server": "documentation",
+        "tool": "search_docs",
+        "arguments": {
+          "query": "distinct keys"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "matches": [
+            {
+              "document": "idempotency-concurrency-contract.md",
+              "line": 3,
+              "text": "Concurrent calls with the same key share one in-flight operation. Distinct keys must retain distinct values and independent progress. Failed work is removed from the in-flight map so a later retry can execute."
+            }
+          ],
+          "truncated": false
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 1
+    },
+    {
+      "sequence": 3,
+      "call": {
+        "server": "repository",
+        "tool": "read_file",
+        "arguments": {
+          "path": "idempotency.ts"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "path": "idempotency.ts",
+          "text": "export class IdempotencyGate<T> {\n  private readonly completed = new Map<string, T>();\n\n  async run(key: string, operation: () => Promise<T>): Promise<T> {\n    const completed = this.completed.get(key);\n    if (completed !== undefined) {\n      return completed;\n    }\n\n    const value = await operation();\n    this.completed.set(key, value);\n    return value;\n  }\n}\n\n"
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 4,
+      "call": {
+        "server": "database",
+        "tool": "query_context",
+        "arguments": {
+          "query_name": "failure_history"
+        }
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "query_name": "failure_history",
+          "rows": [
+            [
+              "concurrency",
+              "same-key requests duplicated an operation"
+            ]
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 0
+    },
+    {
+      "sequence": 5,
+      "call": {
+        "server": "test_runner",
+        "tool": "run_public_tests",
+        "arguments": {}
+      },
+      "result": {
+        "ok": true,
+        "content": {
+          "suite": "public",
+          "commands": [
+            {
+              "command": [
+                "$NODE",
+                "--test",
+                "idempotency_public.test.mjs"
+              ],
+              "exit_code": 1,
+              "duration_ms": 282,
+              "stdout": "✖ same-key calls share one operation (13.060209ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 107.555375\n\n✖ failing tests:\n\ntest at idempotency_public.test.mjs:6:1\n✖ same-key calls share one operation (13.060209ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  2 !== 1\n  \n      at TestContext.<anonymous> (file:///private/var/folders/84/jqrx8jc14vv0c4ktg8kyny280000gn/T/mcp-rl-typescript-idempotency-0p5c55d0/candidate/idempotency_public.test.mjs:16:10)\n      at async Test.run (node:internal/test_runner/test:1125:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 2,\n    expected: 1,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n",
+              "stderr": "",
+              "timed_out": false,
+              "output_truncated": false
+            }
+          ]
+        },
+        "error_code": null,
+        "error_message": null
+      },
+      "duration_ms": 389
+    }
+  ],
+  "patch_sha256": "33ad4056018cd97a3a8d364c7449e075fb49f665a5d20af329bedba14eb9de0b",
+  "final_explanation": "The completed cache alone cannot close the interval between starting and finishing an operation. An in-flight map keyed by idempotency key shares only equivalent work, keeps unrelated keys independent, stores successful values, and deletes the promise in `finally` so failures can retry. Average lookup remains O(1).",
+  "verification": {
+    "classification": "accepted",
+    "accepted": true,
+    "changed_files": [
+      "idempotency.ts"
+    ],
+    "public_results": [
+      {
+        "command": [
+          "$NODE",
+          "--test",
+          "idempotency_public.test.mjs"
+        ],
+        "exit_code": 0,
+        "duration_ms": 123,
+        "stdout": "✔ same-key calls share one operation (12.215125ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 87.119542\n",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "held_out_results": [
+      {
+        "command": [
+          "$NODE",
+          "--test",
+          "idempotency_held_out.test.mjs"
+        ],
+        "exit_code": 0,
+        "duration_ms": 106,
+        "stdout": "✔ distinct keys retain distinct work (0.923334ms)\n✔ failed work can be retried (0.220167ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 71.087583\n",
+        "stderr": "",
+        "timed_out": false,
+        "output_truncated": false
+      }
+    ],
+    "benchmark_results": [],
+    "errors": [],
+    "candidate_workspace_exclusions_verified": true,
+    "duration_ms": 382
+  },
+  "reward": {
+    "tool_discovery": 1.0,
+    "relevant_tool_selection": 1.0,
+    "evidence_gathering": 1.0,
+    "patch_correctness": 1.0,
+    "public_tests": 1.0,
+    "held_out_tests": 1.0,
+    "maintainability": 1.0,
+    "performance": 1.0,
+    "final_explanation": 1.0,
+    "total": 100.0
+  },
+  "started_at": "2026-07-30T00:00:00Z",
+  "completed_at": "2026-07-30T00:00:00Z"
+}
