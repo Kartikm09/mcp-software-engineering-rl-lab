@@ -21,6 +21,8 @@ jobs:
           distribution: temurin
           java-version: "25"
       - uses: dtolnay/rust-toolchain@stable
+      - name: Record the concrete Rust compiler path
+        run: echo "MCP_RL_RUSTC=$(rustup which rustc)" >> "$GITHUB_ENV"
       - uses: actions/setup-go@v7
         with:
           go-version: "1.24.x"
