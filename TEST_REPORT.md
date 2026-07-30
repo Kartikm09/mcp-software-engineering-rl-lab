@@ -7,9 +7,9 @@
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| Pytest | Pass | 23 passed, 0 failed, 0 skipped in 34.33 seconds |
+| Pytest | Pass | 23 passed, 0 failed, 0 skipped in 30.15 seconds |
 | Ruff lint | Pass | All Python files passed configured `E`, `F`, `I`, `B`, `UP`, and `SIM` rules |
-| Ruff format | Pass | 143 files formatted |
+| Ruff format | Pass | 146 files formatted |
 | Task/schema validation | Pass | 6 tasks and 6 environment descriptors |
 | Structured files | Pass | 45 JSON/YAML files parsed |
 | Golden patches | Pass | 6 accepted |
@@ -28,7 +28,7 @@
 | Java | `javac 25.0.3` |
 | Rust | `rustc 1.97.1` |
 | Go | `go1.26.5 darwin/arm64` |
-| TypeScript runtime | Node.js 24.14.0 native type stripping |
+| TypeScript runtime | Node.js 24.18.0 native type stripping |
 | C++ | Apple Clang 17.0.0 with C++20 |
 
 `python scripts/build_environments.py` resolved all six configured executables and confirmed that every referenced task directory exists.
