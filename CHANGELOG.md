@@ -7,4 +7,5 @@
 - Added isolated candidate workspaces, safe patch application, deterministic verification, reward scoring, episode reports, golden patches, and negative controls.
 - Added a scheduled dependency and secret scan using current GitHub Actions runtimes.
 - Recorded the concrete Rust compiler path in CI so isolated evaluator subprocesses do not depend on the runner's rustup selector state.
+- Disabled Go dependency caching because the self-contained benchmark fixture intentionally has no module manifest.
 - Replaced the abbreviated license notice with the complete Apache-2.0 license text.
