@@ -11,9 +11,9 @@ COPY mcp_servers ./mcp_servers
 COPY tasks ./tasks
 COPY fixtures ./fixtures
 COPY schemas ./schemas
-RUN pip install --no-cache-dir .
+RUN python -m pip install --no-cache-dir pip==26.2.1 \
+    && python -m pip install --no-cache-dir .
 
 USER 65532:65532
 ENTRYPOINT ["mcp-rl-lab"]
 CMD ["catalogue"]
-
