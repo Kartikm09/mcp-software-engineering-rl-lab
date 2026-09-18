@@ -18,6 +18,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      - run: python -m pip install pip==26.2.1
       - run: python -m pip install -e '.[dev]' pip-audit
       - run: python scripts/secret_scan.py
       - run: python -m pip_audit --local --skip-editable

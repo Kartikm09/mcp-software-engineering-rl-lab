@@ -3,6 +3,7 @@ PYTHON ?= python3
 .PHONY: setup lint test validate verify-golden sample evidence verify secret-scan docker-smoke
 
 setup:
+	$(PYTHON) -m pip install pip==26.2.1
 	$(PYTHON) -m pip install -e '.[dev]'
 
 lint:
@@ -34,3 +35,7 @@ verify: lint test validate verify-golden sample evidence secret-scan
 docker-smoke:
 	docker compose build
 	docker compose up --abort-on-container-exit --exit-code-from lab
+
+.PHONY: verify-protocol
+verify-protocol:
+	$(PYTHON) -m pytest tests/protocol_bench

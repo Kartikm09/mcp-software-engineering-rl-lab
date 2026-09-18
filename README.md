@@ -115,6 +115,7 @@ Prerequisites are Python 3.11+, Git, and compatible language toolchains for the 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
+python -m pip install pip==26.2.1
 python -m pip install -e '.[dev]'
 python -m mcp_rl_lab catalogue
 python scripts/validate_task_packages.py
@@ -212,3 +213,12 @@ Start with one manifest, compare its golden and incorrect patches, then inspect 
 ## License and safety
 
 Apache-2.0 licensed. Use only on repositories and patches you are authorized to evaluate. No real credentials, private code, or confidential evaluation data are included. Read [`SAFETY.md`](SAFETY.md) before running candidate code.
+
+## Actual stdio MCP task calibration
+
+The isolated [protocol bench](docs/protocol-bench/README.md) adds four synthetic Python coding tasks,
+two real official-SDK stdio servers, behavioral reference/alternative/negative controls, and seven
+per-attempt evidence artifacts. It preserves the existing six-language catalog and commands.
+`python -m pytest tests/protocol_bench` verifies real protocol calls and task acceptance. The runner
+is explicitly no-key scripted calibration; it does not claim live model performance or hostile-code
+containment. See the linked guide for requirements, safety boundaries and reproduction commands.
