@@ -1,0 +1,43 @@
+{
+  "id": "scheduled-delivery",
+  "version": "1",
+  "classification": "synthetic-no-key-calibration",
+  "allowed_paths": [
+    "solution.py"
+  ],
+  "required_sources": [
+    "R-scheduled-delivery",
+    "I-scheduled-delivery"
+  ],
+  "decision": "Use explicit terminal states, fake-clock retry deadlines and immutable schedule identity.",
+  "records": {
+    "R-scheduled-delivery": {
+      "source_id": "R-scheduled-delivery",
+      "version": "1",
+      "task_id": "scheduled-delivery",
+      "classification": "synthetic",
+      "text": "Schedule a stable ID, due tick and payload. run(now, effect) processes due pending/retry jobs at most once per call. Three total attempts maximum, retries at now+2 ticks. Cancel pending/retry only; done/cancelled/failed stay terminal. Repeated schedule with same ID and payload/due is idempotent, conflicting payload/due raises ValueError."
+    },
+    "I-scheduled-delivery": {
+      "source_id": "I-scheduled-delivery",
+      "version": "1",
+      "task_id": "scheduled-delivery",
+      "classification": "synthetic",
+      "text": "Synthetic cancellation request returned success but a cancelled parcel was still dispatched. A retry workaround rewrote completed jobs as cancelled on late requests."
+    },
+    "L-scheduled-delivery": {
+      "source_id": "L-scheduled-delivery",
+      "version": "1",
+      "task_id": "scheduled-delivery",
+      "classification": "synthetic",
+      "text": "Synthetic cancellation request returned success but a cancelled parcel was still dispatched. A retry workaround rewrote completed jobs as cancelled on late requests."
+    },
+    "T-scheduled-delivery": {
+      "source_id": "T-scheduled-delivery",
+      "version": "1",
+      "task_id": "scheduled-delivery",
+      "classification": "synthetic",
+      "text": "pending -> cancelled | done | retry; retry -> cancelled | done | failed. completed effects never repeat; failed is terminal after attempt three."
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "id": "duplicate-work",
+  "version": "1",
+  "classification": "synthetic-no-key-calibration",
+  "allowed_paths": [
+    "solution.py"
+  ],
+  "required_sources": [
+    "R-duplicate-work",
+    "I-duplicate-work"
+  ],
+  "decision": "Use one shielded in-flight task per key and evict failed tasks; retain successful results.",
+  "records": {
+    "R-duplicate-work": {
+      "source_id": "R-duplicate-work",
+      "version": "1",
+      "task_id": "duplicate-work",
+      "classification": "synthetic",
+      "text": "Successful work is cached per key. Concurrent equal keys share one effect. Independent keys progress without waiting for each other. Failed work must be evicted so retry succeeds; caller cancellation must not cancel shared work."
+    },
+    "I-duplicate-work": {
+      "source_id": "I-duplicate-work",
+      "version": "1",
+      "task_id": "duplicate-work",
+      "classification": "synthetic",
+      "text": "Synthetic incident: two queued callers with invoice-key=alpha entered the same side effect before either completed. Global-lock workaround later blocked unrelated beta work."
+    },
+    "L-duplicate-work": {
+      "source_id": "L-duplicate-work",
+      "version": "1",
+      "task_id": "duplicate-work",
+      "classification": "synthetic",
+      "text": "Synthetic incident: two queued callers with invoice-key=alpha entered the same side effect before either completed. Global-lock workaround later blocked unrelated beta work."
+    },
+    "T-duplicate-work": {
+      "source_id": "T-duplicate-work",
+      "version": "1",
+      "task_id": "duplicate-work",
+      "classification": "synthetic",
+      "text": "absent -> running -> completed; running -> failed -> absent. Cancellation of one waiter keeps the shared operation running."
+    }
+  }
+}

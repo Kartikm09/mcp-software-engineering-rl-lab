@@ -1,0 +1,31 @@
+import asyncio
+
+
+class Coordinator:
+    def __init__(self):
+        self.tasks = {}
+
+    async def run(self, key, factory):
+        key = "all-keys"
+        task = self.tasks.get(key)
+        if task is None:
+            task = asyncio.create_task(factory())
+            self.tasks[key] = task
+
+            def clear_failed(completed):
+                if (completed.cancelled() or completed.exception() is not None) and self.tasks.get(
+                    key
+                ) is completed:
+                    del self.tasks[key]
+
+            task.add_done_callback(clear_failed)
+        try:
+            return await asyncio.shield(task)
+        except BaseException:
+            if (
+                task.done()
+                and (task.cancelled() or task.exception() is not None)
+                and self.tasks.get(key) is task
+            ):
+                del self.tasks[key]
+            raise

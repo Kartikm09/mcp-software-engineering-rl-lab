@@ -1,0 +1,43 @@
+{
+  "id": "module-boundary",
+  "version": "1",
+  "classification": "synthetic-no-key-calibration",
+  "allowed_paths": [
+    "solution.py"
+  ],
+  "required_sources": [
+    "R-module-boundary",
+    "I-module-boundary"
+  ],
+  "decision": "Remove optional vendor SDK import and keep strict normalization behavior in a pure module.",
+  "records": {
+    "R-module-boundary": {
+      "source_id": "R-module-boundary",
+      "version": "1",
+      "task_id": "module-boundary",
+      "classification": "synthetic",
+      "text": "The domain normalization module must use only Python standard library. Remove vendor telemetry/network import dependencies while preserving normalize(name, enabled): name must be string, trim and casefold; enabled must be a genuine bool; invalid values raise ValueError; output is {name, enabled}. No telemetry side effect belongs in domain normalization."
+    },
+    "I-module-boundary": {
+      "source_id": "I-module-boundary",
+      "version": "1",
+      "task_id": "module-boundary",
+      "classification": "synthetic",
+      "text": "Synthetic import incident: a domain module could not load when optional vendor SDK was absent. An apparent fix silently coerced strings such as \"false\" to true."
+    },
+    "L-module-boundary": {
+      "source_id": "L-module-boundary",
+      "version": "1",
+      "task_id": "module-boundary",
+      "classification": "synthetic",
+      "text": "Synthetic import incident: a domain module could not load when optional vendor SDK was absent. An apparent fix silently coerced strings such as \"false\" to true."
+    },
+    "T-module-boundary": {
+      "source_id": "T-module-boundary",
+      "version": "1",
+      "task_id": "module-boundary",
+      "classification": "synthetic",
+      "text": "raw record -> validated domain record; invalid input -> ValueError with no telemetry calls."
+    }
+  }
+}

@@ -1,0 +1,13 @@
+--- a/solution.py
++++ b/solution.py
+@@ -18,8 +18,8 @@
+ 
+     def cancel(self, identifier):
+         job = self.jobs[identifier]
+-        if job["status"] in {"pending", "retry"}:
+-            pass  # acknowledges without changing status
++        if job["status"] != "cancelled":
++            job["status"] = "cancelled"
+             return True
+         return False
+ 

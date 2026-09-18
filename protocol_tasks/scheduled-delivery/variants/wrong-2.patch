@@ -1,0 +1,20 @@
+--- a/solution.py
++++ b/solution.py
+@@ -19,7 +19,7 @@
+     def cancel(self, identifier):
+         job = self.jobs[identifier]
+         if job["status"] in {"pending", "retry"}:
+-            pass  # acknowledges without changing status
++            job["status"] = "cancelled"
+             return True
+         return False
+ 
+@@ -31,7 +31,7 @@
+             try:
+                 effect(identifier, job["payload"])
+             except Exception:
+-                job["status"] = "retry" if job["attempts"] < 3 else "failed"
++                job["status"] = "failed"
+                 job["due"] = now + 2
+             else:
+                 job["status"] = "done"

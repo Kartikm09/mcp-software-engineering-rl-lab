@@ -1,0 +1,18 @@
+--- a/solution.py
++++ b/solution.py
+@@ -19,13 +19,13 @@
+     def cancel(self, identifier):
+         job = self.jobs[identifier]
+         if job["status"] in {"pending", "retry"}:
+-            pass  # acknowledges without changing status
++            job["status"] = "cancelled"
+             return True
+         return False
+ 
+     def run(self, now, effect):
+         for identifier, job in self.jobs.items():
+-            if job["status"] not in {"pending", "retry"} or job["due"] > now:
++            if not (job["status"] in ("pending", "retry") and now >= job["due"]):
+                 continue
+             job["attempts"] += 1
+             try:

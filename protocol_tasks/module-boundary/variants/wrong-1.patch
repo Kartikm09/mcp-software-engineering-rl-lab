@@ -1,0 +1,14 @@
+--- a/solution.py
++++ b/solution.py
+@@ -1,9 +1,4 @@
+-import importlib.util
+-
+-VENDOR_SDK = importlib.util.find_spec("requests")
+-
+-
+ def normalize(name, enabled):
+-    if not isinstance(name, str) or type(enabled) is not bool:
++    if not isinstance(name, str) or enabled is None:
+         raise ValueError("invalid record")
+-    return {"name": name.strip().casefold(), "enabled": enabled}
++    return {"name": name.strip().casefold(), "enabled": bool(enabled)}

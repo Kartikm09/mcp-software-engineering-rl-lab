@@ -1,0 +1,43 @@
+{
+  "id": "repeated-validation",
+  "version": "1",
+  "classification": "synthetic-no-key-calibration",
+  "allowed_paths": [
+    "solution.py"
+  ],
+  "required_sources": [
+    "R-repeated-validation",
+    "I-repeated-validation"
+  ],
+  "decision": "Memoize validation by typed immutable value while preserving order and invalid-input rejection.",
+  "records": {
+    "R-repeated-validation": {
+      "source_id": "R-repeated-validation",
+      "version": "1",
+      "task_id": "repeated-validation",
+      "classification": "synthetic",
+      "text": "compute(records) returns (sku, qty*7) in order. validate rejects empty/nonstring sku and any qty that is not a genuine int from 1 through 9. Validation must still reject invalid repeated records. For N exact repeated valid values, validate at most once per distinct typed value. Different qty for same sku is distinct. Never mutate inputs."
+    },
+    "I-repeated-validation": {
+      "source_id": "I-repeated-validation",
+      "version": "1",
+      "task_id": "repeated-validation",
+      "classification": "synthetic",
+      "text": "Synthetic hot path validated each identical line 200 times. A cache keyed by sku returned the first amount for later quantities. A typed-value collision also confused bool True with int 1."
+    },
+    "L-repeated-validation": {
+      "source_id": "L-repeated-validation",
+      "version": "1",
+      "task_id": "repeated-validation",
+      "classification": "synthetic",
+      "text": "Synthetic hot path validated each identical line 200 times. A cache keyed by sku returned the first amount for later quantities. A typed-value collision also confused bool True with int 1."
+    },
+    "T-repeated-validation": {
+      "source_id": "T-repeated-validation",
+      "version": "1",
+      "task_id": "repeated-validation",
+      "classification": "synthetic",
+      "text": "unseen typed value -> validate -> cache computed result; repeated valid value -> reuse; invalid value -> ValueError."
+    }
+  }
+}

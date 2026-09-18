@@ -1,0 +1,20 @@
+--- a/solution.py
++++ b/solution.py
+@@ -6,8 +6,14 @@
+ 
+ 
+ def compute(records):
+-    output = []
++    output, cache = [], {}
+     for record in records:
+-        sku, qty = validate(record)
+-        output.append((sku, qty * 7))
++        # Validate unhashable shapes before constructing the key.
++        if not isinstance(record.get("sku"), str) or type(record.get("qty")) is not int:
++            validate(record)
++        key = (record["sku"], record["qty"])
++        if key not in cache:
++            sku, qty = validate(record)
++            cache[key] = (sku, qty * 7)
++        output += [cache[key]]
+     return output
