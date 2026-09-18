@@ -87,6 +87,12 @@ The module-boundary check combines behavioral tests with a documented static imp
 for common network modules. It rejects `urllib`, `http`, `socket`, `ftplib`, `smtplib`, `telnetlib`,
 `xmlrpc` and `ssl`, and third-party imports. It is not a proof against dynamically obfuscated imports.
 
+The existing Docker recipe runs the original six-task catalogue with a read-only filesystem,
+network disabled and temporary `/tmp`; it does not supply the native language compilers. The
+18 September container smoke run passed but exposed an inherited pip25.0.1 installer. Its six
+reported pip advisories are addressed by explicitly installing pip26.2.1 before package setup,
+matching the documented development bootstrap. CI now runs that same catalogue smoke command.
+
 ## Review-driven corrections
 
 A controlled cancellation regression exposed a subtle reference issue: if the only waiter cancels
